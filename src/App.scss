@@ -1,0 +1,243 @@
+// IMPORTS
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+// import a nice font from Google Fonts besides the default font above
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css?family=Nunito:200,300,400,600,700&display=swap");
+
+// VARIABLES
+$primary-color: #f7fafc; /* New top header color */
+$secondary-color: #004aad; /* New light blue color */
+$third-color: #f1f1f1; /* New light grey color */
+$fourth-color: #929090; /* New light grey color */
+$background-color: #eef0f2; /* New background color for the task bar */
+$text-color: #000000; /* Text color */
+$highlight-color: #ff0; /* Highlight color */
+$font-family: 'sans-serif'; /* Font family */
+$font-family-2: 'Open Sans', sans-serif; /* Font family 2 */
+$font-family-3: 'Nunito', sans-serif; /* Font family 3 */
+// nice light grey color for the background
+
+// STYLES
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  background-color: $background-color;
+  color: $text-color;
+  font-family: $font-family-3;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-weight: bold;
+  font-family: $font-family-2;
+  
+}
+.spinner-border {
+  color: $secondary-color;
+  width: 5rem;
+  height: 5rem;
+  margin: 3%;
+
+}
+
+.google-logo {
+  margin: 5px;
+  height: 15px;
+  width: 15px;
+}
+.x-logo {
+  margin: 5px;
+  height: 20px;
+  width: 20px;
+}
+.navbar{
+  box-shadow: 0 4px 6px 0 rgba(0,0,0,0.3);
+  .nav-links {
+    width: 30%;
+    .navbar-nav {
+      width: 100%;
+      justify-content: space-around;
+    }
+  }
+}
+.btn {
+  &.btn-primary {
+    border-color: $secondary-color;
+  }
+  &.btn-danger {
+    background-color: red;
+    border-color: red;
+  } 
+  &:hover {
+    opacity: 0.8;
+  }
+  &.search-btn{
+    border-radius: 20px;
+    font-size: 1.2rem;
+
+    padding: 12px;
+  }
+}
+
+.search-bar {
+  .search-header{
+    height: 50px;
+  }
+  .search-card {
+    border: 1px solid rgb(87, 79, 79);
+  }
+  .search-contents{
+  input{
+    text-align: center;
+    border-radius: 10px;
+    padding: 10px;
+    border: 1.5px solid $secondary-color;
+
+  }
+}
+}
+.filter-box {
+.form-check {
+  margin-top: 20px;
+}
+
+label {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+}
+
+
+.nav-pills .nav-link.active {
+  border-color: $secondary-color;
+  background-color: $secondary-color;
+  button {
+    color: $primary-color
+  }
+}
+  
+
+.logo {
+  height: 50px;
+  width: 50px;
+  margin-bottom: 5px;
+  margin-left: 5px;
+}
+
+.navbar-brand {
+  font-size: xx-large;
+}
+
+
+
+.dropdown-menu {
+  font-size: 0.75rem;
+  margin-right: 5px;
+  max-height: 300px;
+  overflow-y: scroll;
+
+}
+
+.search-results {
+  border: 1px solid $secondary-color;
+}
+
+.search-term{
+  font-style:italic;
+}
+
+.carousel-control-prev, .carousel-control-next {
+  opacity: 0.5;
+  // background-color: opacify($color: $third-color, $amount: 0.5);
+  &:hover {
+    opacity: 0.3;
+  }
+  &:focus {
+    opacity: 0.5;
+  }
+}
+.carousel-control-next-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23000' viewBox='0 0 8 8'%3E%3Cpath d='M2.75 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z'/%3E%3C/svg%3E") !important;
+}
+
+.carousel-control-prev-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23000' viewBox='0 0 8 8'%3E%3Cpath d='M5.25 0l1.5 1.5-2.5 2.5 2.5 2.5-1.5 1.5-4-4 4-4z'/%3E%3C/svg%3E") !important;
+}
+
+.modal-backdrop {
+    background-color: #00000054;
+  }
+
+.card-header {
+  background-color: $secondary-color;
+  color: $primary-color;
+  font-weight: bold;
+}
+
+.btn-primary {
+}
+.reservation-details {
+    li {
+        border-bottom: 1px solid $fourth-color;
+        padding: 5px;
+        font-size: 1.1rem;
+    }
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.price-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 70px; /* Adjust based on your design */
+}
+
+.reserve-btn {
+  height: fit-content;
+}
+
+.d-flex.align-items-center {
+  align-items: center;
+}
+
+.d-flex.justify-content-between {
+  justify-content: space-between;
+}
+
+
+.dash-content {
+  .card {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.admin-dash{
+  li{
+    margin-top: 10px;
+  }
+  a {
+    cursor: pointer;
+    text-decoration: none;
+    color: $text-color;
+    font-size: 20px;
+    padding: 5px;
+    &.active {
+     background-color: $secondary-color;
+      color: $primary-color;
+      border-radius: 5px;
+    }
+  }
+}
+
