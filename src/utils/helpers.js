@@ -16,7 +16,9 @@ export const getUserLocation = async (setHotels, setLocation) => {
         setKey(import.meta.env.VITE_GOOGLE_API_KEY);  
         fromLatLng(position.coords.latitude, position.coords.longitude).then(
             (response) => {
+
                 const city = response.results[0].address_components[3].long_name;
+                console.log(city)
                 setLocation(city);
                 const query = { query: city };
                 getHotelsByCity(query).then((response) => {
