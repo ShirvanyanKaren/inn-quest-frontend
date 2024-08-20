@@ -2,39 +2,33 @@ import { setKey, fromLatLng } from "react-geocode";
 import { getHotelsByCity } from "../services/hotel";
 
 export const getUserLocation = async (setHotels, setLocation) => {
-  const permission = await navigator.permissions.query({ name: 'geolocation' });
-  if (permission.state === 'denied') {
-      setLocation("California");
-      getHotelsByCity({ query: "California" }).then((response) => {
-          setHotels(Array.isArray(response.data) ? response.data : []);
-      }).catch(() => {
-          setHotels([]);
-      });
-  } else {
-      navigator.geolocation.getCurrentPosition((position) => {
-          console.log(position);
-          setKey(import.meta.env.VITE_GOOGLE_API_KEY);
-          fromLatLng(position.coords.latitude, position.coords.longitude).then(
-              (response) => {
-                  const city = response.results[0].address_components[3].long_name;
-                  console.log(city);
-                  setLocation(city);
-                  const query = { query: city };
-                  getHotelsByCity(query).then((response) => {
-                      setHotels(Array.isArray(response.data) ? response.data : []);
-                  }).catch(() => {
-                      setHotels([]);
-                  });
-              },
-              (error) => {
-                  console.error(error);
-                  setHotels([]);
-              }
-          );
-      });
-  }
-};
+    const permission = await navigator.permissions.query({ name: 'geolocation' });
+    if (permission.state === 'denied') {
+        setLocation("California");
+        getHotelsByCity({query: "California"}).then((response) => {
+            setHotels(response.data);
+        }
+        );
 
+    } else {
+    navigator.geolocation.getCurrentPosition((position) => {
+      console.log(position);
+        setKey(import.meta.env.VITE_GOOGLE_API_KEY);  
+        fromLatLng(position.coords.latitude, position.coords.longitude).then(
+            (response) => {
+                const city = response.results[0].address_components[3].long_name;
+                setLocation(city);
+                const query = { query: city };
+                getHotelsByCity(query).then((response) => {
+                    setHotels(response.data);
+                });
+            },
+            (error) => {
+                console.error(error);
+            });
+    });
+}
+};
 
 export const idbPromise = (storeName, method, object) => {
   return new Promise((resolve, reject) => {

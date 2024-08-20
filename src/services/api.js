@@ -8,12 +8,10 @@ import axios from "axios";
  * @constant}
  */
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
+    baseURL: "http://localhost:8000",
     headers: {
-        "Content-Type": "application/json",
-        "ngrok-skip-browser-warning": 6000,
+        "Content-Type": "application/json"
     },
-    
 });
 
 /**
@@ -26,7 +24,6 @@ const api = axios.create({
  */
 api.interceptors.request.use(
     (config) => {
-        config.headers["ngrok-skip-browser-warning"] = "true";
         const token = localStorage.getItem("access_token");
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;

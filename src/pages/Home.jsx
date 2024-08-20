@@ -5,14 +5,12 @@ import { getUserLocation } from "../utils/helpers";
 import Search from "../components/Search";
 import Auth from "../utils/auth";
 import ImagesSlider from "../components/ImageSlider";
-import axios from "axios";
 
 const Home = () => {
   const [hotels, setHotels] = useState([]);
   const [location, setLocation] = useState("");
   const [allowLocation, setAllowLocation] = useState(false);
   const [loading, setLoading] = useState(false);
-
 
   const getGeoLocation = async () => {
     const res = await getUserLocation(setHotels, setLocation);
@@ -22,7 +20,8 @@ const Home = () => {
     getGeoLocation();
   }, [allowLocation]);
 
-  if(hotels) console.log(hotels, "hotels", hotels.length);
+  console.log(hotels);
+
   return loading ? (
     <div className="d-flex justify-content-center">
       <div className="spinner-border" role="status">
@@ -35,12 +34,10 @@ const Home = () => {
       {location && (
         <h4 className="text-center mt-2">{location} Hotels</h4>
       )}
-      <div className="row">
-        {
-        hotels?.length > 0? (
-        hotels?.map((hotel) => 
+      <div className="row hotels-home">
+        {hotels?.map((hotel) => 
         (
-          <div className="col-4 mb-3" key={hotel.id}>
+          <div className="col-4 mb-3 hotel-card" key={hotel.id}>
             <div className="card h-100">
               <ImagesSlider images={hotel.image_urls} />
               <div className="card-body d-flex flex-column">
@@ -61,13 +58,7 @@ const Home = () => {
               </div>
             </div>
           </div>
-        ))
-        ) : (
-          <div className="text-center">
-            <h4>No hotels found in {location}</h4>
-          </div>
-        )
-      }
+        ))}
       </div>
     </div>
   );

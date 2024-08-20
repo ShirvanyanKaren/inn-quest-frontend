@@ -184,7 +184,7 @@ const CreateHotel = ({ show, handleClose, edit, currHotel}) => {
           </div>
           <div className="row">
             <label htmlFor="image">Images</label>
-            {hotel?.image_urls?.length > 0 && hotel?.image_urls?.map((image, index) => (
+            {hotel?.image_urls?.length > 0 && hotel.image_urls.map((image, index) => (
                 <div key={index} className="card mb-1 flex-grow-1 p-3"
                 style={{width: "200px"}}
                 >
