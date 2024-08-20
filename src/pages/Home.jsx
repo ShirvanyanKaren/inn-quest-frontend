@@ -5,12 +5,14 @@ import { getUserLocation } from "../utils/helpers";
 import Search from "../components/Search";
 import Auth from "../utils/auth";
 import ImagesSlider from "../components/ImageSlider";
+import axios from "axios";
 
 const Home = () => {
   const [hotels, setHotels] = useState([]);
   const [location, setLocation] = useState("");
   const [allowLocation, setAllowLocation] = useState(false);
   const [loading, setLoading] = useState(false);
+
 
   const getGeoLocation = async () => {
     const res = await getUserLocation(setHotels, setLocation);
@@ -20,8 +22,7 @@ const Home = () => {
     getGeoLocation();
   }, [allowLocation]);
 
-  console.log(hotels);
-
+  if(hotels) console.log(hotels, "hotels", hotels.length);
   return loading ? (
     <div className="d-flex justify-content-center">
       <div className="spinner-border" role="status">
@@ -35,7 +36,9 @@ const Home = () => {
         <h4 className="text-center mt-2">{location} Hotels</h4>
       )}
       <div className="row">
-        {hotels?.map((hotel) => 
+        {
+        hotels?.length > 0? (
+        hotels?.map((hotel) => 
         (
           <div className="col-4 mb-3" key={hotel.id}>
             <div className="card h-100">
@@ -58,7 +61,13 @@ const Home = () => {
               </div>
             </div>
           </div>
-        ))}
+        ))
+        ) : (
+          <div className="text-center">
+            <h4>No hotels found in {location}</h4>
+          </div>
+        )
+      }
       </div>
     </div>
   );
