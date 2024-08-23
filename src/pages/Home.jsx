@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getHotelsByCity } from "../services/hotel";
 import { getUserLocation } from "../utils/helpers";
+import { setKey, fromLatLng } from "react-geocode";
 import Search from "../components/Search";
 import Auth from "../utils/auth";
 import ImagesSlider from "../components/ImageSlider";
@@ -16,11 +17,10 @@ const Home = () => {
     const res = await getUserLocation(setHotels, setLocation);
   };
 
+
   useEffect(() => {
     getGeoLocation();
   }, [allowLocation]);
-
-  console.log(hotels);
 
   return loading ? (
     <div className="d-flex justify-content-center">

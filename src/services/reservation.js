@@ -74,7 +74,6 @@ export const getReservations = async () => {
  */
 export const updateReservation = async (resInfo) => {
     try {
-        console.log(resInfo);
         const response = await api.put(`/api/reservation/${resInfo.id}/`, resInfo);
         return response;
     } catch (error) {
@@ -90,9 +89,11 @@ export const updateReservation = async (resInfo) => {
  * @param {number|string} id - The ID of the reservation to delete.
  * @returns A promise that resolves to the response from the API or an error.
  */
-export const deleteReservation = async (id) => {
+export const deleteReservation = async (resInfo) => {
     try {
-        const response = await api.delete(`/api/reservation/${id}/`);
+        const response = await api.delete(`/api/reservation/${resInfo.id}/`, {
+            data: resInfo
+        });
         return response;
     } catch (error) {
         return error;

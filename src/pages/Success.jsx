@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { createReservation } from "../services/reservation";
+import { createReservation, deleteReservation} from "../services/reservation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { idbPromise } from "../utils/helpers";
 import { getHotel } from "../services/hotel";
+import { Modal } from 'react-bootstrap';
+import Auth from "../utils/auth";
 import Loading from '../components/Loading';
 import dayjs from "dayjs";
 
@@ -12,6 +14,10 @@ const Success = () => {
     const [hotel, setHotel] = useState({});
     const [loading, setLoading] = useState(true);
     const [success, setSuccess] = useState(false);
+    const [showCancel, setShowCancel] = useState(false);
+    const [thisReservation, setThisReservation] = useState({});
+    const [error, setError] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
 
     useEffect(() => {
         let reservation = localStorage.getItem("reservation");
@@ -19,7 +25,6 @@ const Success = () => {
         reservation = JSON.parse(reservation);
         console.log(reservation);
         setReservation(reservation);
-        console.log(reservation.hotel, "res");
         getHotel(reservation.hotel).then((response) => {
             console.log(response.data);
             setHotel(response.data[0]);
@@ -33,9 +38,24 @@ const Success = () => {
         const res = await createReservation(reservation);
         const postedReservation = res.data.reservation
         console.log(postedReservation);
+        setThisReservation(postedReservation);
         await idbPromise("reservations", "put", postedReservation);
         const getReservations = await idbPromise("reservations", "get");
         console.log(getReservations); 
+    }
+
+    const submitCancel =  () => {
+        deleteReservation(thisReservation.id).then((response) => {
+            if (response.status === 204) {
+                setSuccessMessage("Reservation cancelled successfully");
+                setTimeout(() => {
+                    setShowCancel(false);
+                }, 2000);
+            } else {
+                setError("Error cancelling reservation");
+            }
+           
+    });
     }
 
 
@@ -44,7 +64,7 @@ const Success = () => {
     ) : (
         <div className='d-flex flex-column justify-content-center'>
             <div className='d-flex justify-content-center'>
-            <div className='card mt-4 w-50'>
+            <div className='card success-card mt-4 m-auto'>
                 <div className='card-header confirmation'
                 >
                 <h2>innQuest<span style={{color: "skyblue"}}>.com</span>
@@ -89,10 +109,18 @@ const Success = () => {
                             You can make changes or view your reservation below
                         </p>
                         <div className='d-flex mt-2'>
-                        <button className='btn btn-primary me-2'>View Reservation</button>
+                        <button 
+                        className='btn btn-primary me-2'
+                        onClick={() => window.location.href = Auth.loggedIn() ? '/reservations' : '/login'}
+                        >
+                           {Auth.loggedIn() ? 'View Reservations' : 'Login to View'}
+                        </button>
                         <button className='btn btn-light'
                         style={{border: '2px solid #004aad'}}
-                        >Make Changes</button>
+                        onClick={() => window.location.href = Auth.loggedIn() ? '/reservations' : '/login'}
+                        >
+                            {Auth.loggedIn() ? 'Make Changes' : 'Login to Manage'}
+                        </button>
                         </div>
                     </div>
                     <div className='d-flex flex-column mt-3'>
@@ -103,7 +131,7 @@ const Success = () => {
                     className="mt-2"
                     style={{height: '200px', objectFit: 'cover', border : '1px solid black', borderRadius: '5px'}}
                     src={reservation.image_url} alt={reservation.hotel_name} />
-                    <div className='text-decoration-none mt-3 reservation-details '>
+                    <div className='text-decoration-none mt-3 reservation-details'>
                         <li className='list-group-item'>
                             <strong>Your Reservation</strong>:
                             <span className="float-end">
@@ -133,9 +161,27 @@ const Success = () => {
                                 <strong>Prepayment</strong>
                                 <span className="float-end">You will be charged a prepayment of the hotel at anytime</span>
                             </li>
-                        <button className="btn btn-danger mt-3">Cancel Reservation</button>
+                        <button className="btn btn-danger mt-3"
+                        onClick={() => setShowCancel(true)}
+                        >
+                            
+                            Cancel Reservation</button>
                         
                     </div>
+                    <Modal show={showCancel} onHide={() => setShowCancel(false)}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Cancel Reservation</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <p>Are you sure you want to cancel your reservation?</p>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <button className="btn btn-primary" onClick={submitCancel}>Yes</button>
+                            <button className="btn btn-danger" onClick={() => setShowCancel(false)}>No</button>
+                        </Modal.Footer>
+                        {successMessage && <p className="ms-2 text-success">{successMessage}</p>}
+                        {error && <p className="ms-2 text-danger">{error}</p>}
+                    </Modal>
                     </div>
                 </div>
             </div>

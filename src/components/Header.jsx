@@ -51,7 +51,7 @@ const handleClickAway = () => {
           <span className="text-dark">
             <img src={InnQuestLogo} alt="FMI logo" className="logo mb-2" />
           </span>
-          Quest&nbsp;{location.pathname === "/admin" ? "Hotel Management" : "Inn"}
+          Quest&nbsp;{location.pathname === "/admin" ? "Hotel Management" : ""}
         </a>
 
         <div className={`nav-links ${hamburger ? "show" : ""}`}>

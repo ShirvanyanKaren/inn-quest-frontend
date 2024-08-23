@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 import { getReservations, updateReservation, deleteReservation } from "../services/reservation";
+import { Link } from "react-router-dom";
+import { stateAbbreviations } from "../utils/helpers";
+import Loading from "../components/Loading";
 import dayjs from "dayjs";
 import Auth from "../utils/auth";
 import ImagesSlider from "../components/ImageSlider";
@@ -15,6 +18,7 @@ const Reservations = () => {
   const [showCancel, setShowCancel] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleClose = () => {
     setShow(false);
@@ -30,8 +34,11 @@ const Reservations = () => {
   };
 
   useEffect(() => {
+    if (!Auth.loggedIn()) window.location.replace("/login");
+    setLoading(true);
     getReservations().then((response) => {
       const data = response.data;
+      console.log(data);
       for (const reservation of data) {
         let nights = dayjs(reservation.check_out_date).diff(
           dayjs(reservation.check_in_date),
@@ -39,12 +46,14 @@ const Reservations = () => {
         );
         reservation.nights = nights;
       }
-      console.log(data);
+      setLoading(false);
       setReservations(data);
     });
-  }, [currReservation]);
+  }, [success]);
 
   const submitUpdate = () => {
+    setSuccess("");
+    setError("");
     updateReservation(currReservation).then((response) => {
       if (response.status === 200) {
         setSuccess("Reservation updated successfully");
@@ -52,20 +61,27 @@ const Reservations = () => {
           handleClose();
         }, 2000);
       } else {
-        setError("Error updating reservation");
+        response = response.response ? response.response : response;
+        let error = response.data.error ? response.data.error : "Error updating reservation";
+        setError(error);
       }
     });
   };
 
   const submitCancel = () => {
-    deleteReservation(currReservation.id).then((response) => {
+    setError("");
+    setSuccess("");
+    console.log(currReservation);
+    deleteReservation(currReservation).then((response) => {
       if (response.status === 204) {
         setSuccess("Reservation cancelled successfully");
         setTimeout(() => {
           handleClose();
         }, 2000);
       } else {
-        setError("Error cancelling reservation");
+        response = response.response ? response.response : response;
+        let error = response.data.error ? response.data.error : "Error cancelling reservation";
+        setError(error);
       }
     });
   };
@@ -73,24 +89,24 @@ const Reservations = () => {
   const handleShowCancel = (reservation) => {
     return () => {
       setShowCancel(true);
-      setReservation({
-        check_in_date: reservation.check_in_date,
-        check_out_date: reservation.check_out_date,
-        num_of_rooms: reservation.num_of_rooms,
-        id: reservation.id,
-      });
+      setReservation(reservation);
     };
   };
 
+  const handleChange = (e) => {
+    if (e.target.id === "num_of_rooms") {
+      setReservation({ ...currReservation, num_of_rooms: Number(e.target.value) });
+    } else {
+      setReservation({ ...currReservation, [e.target.id]: e.target.value });
+    }
+  }
+
   const handleShow = (reservation) => {
     return () => {
+      setError("");
+      setSuccess("");
       setShow(true);
-      setReservation({
-        check_in_date: reservation.check_in_date,
-        check_out_date: reservation.check_out_date,
-        num_of_rooms: reservation.num_of_rooms,
-        id: reservation.id,
-      });
+      setReservation(reservation);
     };
   };
 
@@ -98,38 +114,94 @@ const Reservations = () => {
     <div className="container">
       <h1 className="text-center mt-2">Reservations</h1>
       <div className="d-flex flex-wrap justify-content-center">
-        {!reservations.length && (
+        {(!reservations.length && !loading) && (
           <h2 className="text-center mt-5">No reservations found</h2>
         )}
+        {loading ? (
+          <>
+          <Loading />
+          </>
+        ) : (
+          <>
         {reservations.map((reservation, index) => {
           return (
-            <div key={index} className="card m-2" style={{ width: "18rem" }}>
-              <ImagesSlider images={reservation.image_urls} />
-              <div className="card-body">
-                <h5 className="card-title">{reservation.hotel_name}</h5>
-                <p>Check-in: {reservation.check_in_date}</p>
-                <p>Check-out: {reservation.check_out_date}</p>
-                <p>Number of rooms: {reservation.num_of_rooms}</p>
-                <p>Price: {reservation.reservation_price}</p>
-                <p>Total nights: {reservation.nights}</p>
-              </div>
-              <div className="card-footer d-flex justify-content-around">
-                <button
-                  onClick={handleShow(reservation)}
-                  className="btn btn-primary"
-                >
-                  Update
-                </button>
-                <button
-                  onClick={handleShowCancel(reservation)}
-                  className="btn btn-danger"
-                >
-                  Cancel
-                </button>
+            <div key={reservation.id} className="col-12-lg">
+               <div className="card mt-3">
+                <div className="row no-gutters">
+                  <div className="col-md-4"
+                  >
+                    <ImagesSlider 
+                    style={{borderRadius: '10px'}} 
+                    images={reservation.image_urls} />
+                  </div>
+                  <div className="col-md-8">
+                      <div className="card-body">
+                      <Link
+                      to={`/rooms/${reservation.hotel}`}
+                      style={{ textDecoration: "none", color: "black" }}
+                    >
+                        <h5 className="card-title">{reservation.hotel_name}</h5>
+                        </Link>
+                        <div className="reservation-details">
+                            <li className='list-group-item'>
+                                <strong>Check-in</strong>:
+                                <span className="float-end">
+                                    {dayjs(reservation.check_in_date).format("MMMM DD, YYYY")} (from 11:00)
+                                </span>
+                            </li>
+                            <li className='list-group-item'>
+                                <strong>Check-out</strong>:
+                                <span className="float-end">
+                                    {dayjs(reservation.check_out_date).format("MMMM DD, YYYY")} (until 12:00)
+                                </span>
+                            </li>
+                            <li className='list-group-item'>
+                                <strong>Price</strong>:
+                                <span className="float-end">
+                                    ${reservation.reservation_price.toFixed(2)} 
+                                </span>
+                            </li>
+                            <li className='list-group-item'>
+                                <strong>Number of Rooms:</strong>
+                                <span className="float-end">
+                                    {reservation.num_of_rooms}
+                                </span>
+                            </li>
+                            <li className='list-group-item'>
+                                <strong>Total Nights</strong>:
+                                <span className="float-end">
+                                    {reservation.nights}
+                                </span>
+                            </li>
+                        <button
+                            onClick={handleShow(reservation)}
+                            className="btn btn-light mt-3 me-2"
+                            style={{border: '1px solid #004aad'}}
+                        >
+                            Update Reservation
+                        </button>
+                        <button className="btn btn-danger mt-3"
+                            onClick={() => 
+                            {
+                              setShowCancel(true)
+                              setReservation(reservation)
+                              console.log(reservation)
+                            }
+                            }
+                            >
+                            Cancel Reservation
+                        </button>
+
+                        </div>
+                        </div>
+                  </div>
+                </div>
               </div>
             </div>
           );
         })}
+        </>
+        )}
         <Modal show={showCancel} onHide={() => setShowCancel(false)}>
           <Modal.Header closeButton>
             <Modal.Title> Cancel Reservation</Modal.Title>
@@ -138,8 +210,8 @@ const Reservations = () => {
             <p>Are you sure you want to cancel this reservation?</p>
           </Modal.Body>
           <Modal.Footer>
-            {success && <p className="me-2">{success}</p>}
-            {error && <p className="me-2">{error}</p>}
+            {success && <p className="me-2 text-success">{success}</p>}
+            {error && <p className="me-2 text-danger">{error}</p>}
             <button 
             onClick={submitCancel}
             className="btn btn-danger">Yes
@@ -159,38 +231,36 @@ const Reservations = () => {
           <Modal.Body>
             <form
               className="d-flex flex-column"
-              onChange={(e) =>
-                setReservation({
-                  ...currReservation,
-                  [e.target.id]: e.target.value,
-                })
-              }
+              onChange={handleChange}
             >
               <div className="d-flex flex-column">
                 <label htmlFor="checkin">Check-in</label>
                 <input
                   type="date"
                   id="check_in_date"
+                  className="form-control"
                   value={currReservation.check_in_date}
                 />
                 <label htmlFor="checkout">Check-out</label>
                 <input
                   type="date"
                   id="check_out_date"
+                  className="form-control"
                   value={currReservation.check_out_date}
                 />
                 <label htmlFor="numRooms">Number of rooms</label>
                 <input
                   type="number"
                   id="num_of_rooms"
+                  className="form-control"
                   value={currReservation.num_of_rooms}
                 />
               </div>
             </form>
           </Modal.Body>
           <Modal.Footer>
-            {success && <p className="me-2">{success}</p>}
-            {error && <p className="me-2">{error}</p>}
+            {success && <p className="me-2 text-success">{success}</p>}
+            {error && <p className="me-2 text-danger">{error}</p>}
             <button onClick={submitUpdate} className="btn btn-primary">
               Update
             </button>
